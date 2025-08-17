@@ -1,7 +1,10 @@
 import csv
 from datetime import datetime
+import matplotlib.pyplot as plot
+from collections import defaultdict
 
 FILE_PATH = 'expenses.csv'
+FIXED_AMOUT = 1000
 
 def save_expenses(expenses):
     with open(FILE_PATH, mode='a', newline='', encoding='utf-8') as file:
@@ -15,7 +18,6 @@ def save_expenses(expenses):
         for expense in expenses:
             writer.writerow( expense )
             
-
 def add_expense():
     expenses = []
     category = input("Category: ").strip()
@@ -59,3 +61,21 @@ def remove_expense():
             print('please! provide the date to remove the item or type exit to cancel')
             inner_fuction()
     inner_fuction()
+
+def calculate_expenses():
+    with open(FILE_PATH, mode='r', newline='', encoding='utf-8') as file:
+        reader = csv.DictReader(file)
+        amounts_spended = [int(amount["Amount"]) for amount in reader]
+    return sum(amounts_spended)
+
+def visualize():
+    category_totals = defaultdict(float)
+    with open(FILE_PATH, mode='r', newline='', encoding='utf-8') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            category_totals[row['Category']] += float(row['Amount'])
+        plot.bar(category_totals.keys(), category_totals.values())
+        plot.title("Expenses by Category")
+        plot.xlabel("Category")
+        plot.ylabel("Amount")
+        plot.show()
